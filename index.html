@@ -3,15 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Mini App</title>
+    <title>Provedor de Internet</title>
     <link rel="stylesheet" href="style.css">
-	<script src="https://telegram.org/js/telegram-web-app.js?56"></script>
 </head>
 <body>
     <div id="app">
-        <h1>Olá, Telegram!</h1>
-        <button id="btn">Clique aqui</button>
+        <header>
+            <h1>Bem-vindo ao Nosso Provedor</h1>
+            <p>Sua conexão rápida e confiável!</p>
+        </header>
+
+        <main>
+            <section id="speed-test">
+                <h2>Teste de Velocidade</h2>
+                <button id="test-speed">Testar Velocidade</button>
+                <p id="speed-result"></p>
+            </section>
+
+            <section id="balance">
+                <h2>Consultar Saldo</h2>
+                <button id="check-balance">Verificar Saldo</button>
+                <p id="balance-result"></p>
+            </section>
+
+            <section id="support">
+                <h2>Suporte</h2>
+                <button id="contact-support">Falar com Suporte</button>
+            </section>
+
+            <section id="plans">
+                <h2>Nossos Planos</h2>
+                <ul>
+                    <li>Plano Básico: 100 Mbps - R$ 99,90/mês</li>
+                    <li>Plano Intermediário: 300 Mbps - R$ 149,90/mês</li>
+                    <li>Plano Premium: 1 Gbps - R$ 199,90/mês</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Provedor de Internet. Todos os direitos reservados.</p>
+        </footer>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
