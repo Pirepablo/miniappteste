@@ -1,7 +1,20 @@
-document.getElementById('btn').addEventListener('click', () => {
-    alert('Botão clicado!');
+// Simulação de teste de velocidade
+document.getElementById('test-speed').addEventListener('click', () => {
+    const speed = (Math.random() * 100).toFixed(2); // Gera um valor aleatório
+    document.getElementById('speed-result').textContent = `Velocidade: ${speed} Mbps`;
 });
 
-// Integração com a API do Telegram
+// Simulação de consulta de saldo
+document.getElementById('check-balance').addEventListener('click', () => {
+    const balance = (Math.random() * 100).toFixed(2); // Gera um valor aleatório
+    document.getElementById('balance-result').textContent = `Saldo: R$ ${balance}`;
+});
+
+// Redirecionamento para suporte
+document.getElementById('contact-support').addEventListener('click', () => {
+    window.open('https://t.me/seu_bot_de_suporte', '_blank'); // Substitua pelo link do seu bot de suporte
+});
+
+// Integração com o Telegram
 Telegram.WebApp.ready();
 Telegram.WebApp.expand(); // Expande o app para tela cheia
