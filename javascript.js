@@ -12,7 +12,7 @@ document.getElementById('check-balance').addEventListener('click', () => {
 
 // Redirecionamento para suporte
 document.getElementById('contact-support').addEventListener('click', () => {
-    window.open('https://t.me/seu_bot_de_suporte', '_blank'); // Substitua pelo link do seu bot de suporte
+    window.open('https://t.me/bot_itnetworkbot', '_blank'); // Substitua pelo link do seu bot de suporte
 });
 
 // Integração com o Telegram
