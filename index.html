@@ -15,30 +15,26 @@
         </header>
 
         <main>
-            <section id="speed-test">
-                <h2>Teste de Velocidade</h2>
-                <button id="test-speed">Testar Velocidade</button>
-                <p id="speed-result"></p>
-            </section>
-
-            <section id="balance">
-                <h2>Consultar Saldo</h2>
-                <button id="check-balance">Verificar Saldo</button>
-                <p id="balance-result"></p>
-            </section>
-
-            <section id="support">
-                <h2>Suporte</h2>
-                <button id="contact-support">Falar com Suporte</button>
-            </section>
-
             <section id="plans">
-                <h2>Nossos Planos</h2>
-                <ul>
-                    <li>Plano Básico: 100 Mbps - R$ 99,90/mês</li>
-                    <li>Plano Intermediário: 300 Mbps - R$ 149,90/mês</li>
-                    <li>Plano Premium: 1 Gbps - R$ 199,90/mês</li>
-                </ul>
+                <h2>Nossos Planos de Internet</h2>
+                <div class="plan">
+                    <h3>Plano Básico</h3>
+                    <p><strong>Velocidade:</strong> 100 Mbps</p>
+                    <p><strong>Preço:</strong> R$ 99,90/mês</p>
+                    <button class="select-plan" data-plan="basico">Selecionar Plano</button>
+                </div>
+                <div class="plan">
+                    <h3>Plano Intermediário</h3>
+                    <p><strong>Velocidade:</strong> 300 Mbps</p>
+                    <p><strong>Preço:</strong> R$ 149,90/mês</p>
+                    <button class="select-plan" data-plan="intermediario">Selecionar Plano</button>
+                </div>
+                <div class="plan">
+                    <h3>Plano Premium</h3>
+                    <p><strong>Velocidade:</strong> 1 Gbps</p>
+                    <p><strong>Preço:</strong> R$ 199,90/mês</p>
+                    <button class="select-plan" data-plan="premium">Selecionar Plano</button>
+                </div>
             </section>
         </main>
 
@@ -47,6 +43,6 @@
         </footer>
     </div>
 
-    <script src="javascript.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -20,26 +20,43 @@ header {
 }
 
 header h1 {
-    color: #FF0000;
+    color: #0073e6;
 }
 
-main section {
+#plans {
+    margin: 20px 0;
+}
+
+.plan {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
     margin-bottom: 20px;
+    text-align: center;
 }
 
-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
+.plan h3 {
+    color: #0073e6;
+    margin-bottom: 10px;
+}
+
+.plan p {
+    margin: 5px 0;
+}
+
+.select-plan {
     background-color: #0073e6;
     color: #fff;
     border: none;
     border-radius: 5px;
+    padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
+    margin-top: 10px;
 }
 
-button:hover {
+.select-plan:hover {
     background-color: #005bb5;
 }
 
