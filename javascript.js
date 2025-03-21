@@ -1,8 +1,10 @@
 document.querySelectorAll('.select-plan').forEach(button => {
     button.addEventListener('click', () => {
         const plan = button.getAttribute('data-plan');
-        alert(`Você selecionou o ${plan}. Redirecionando para o checkout...`);
-        // Aqui você pode redirecionar para uma página de checkout ou enviar os dados para o back-end
+        const price = button.getAttribute('data-price');
+
+        // Redireciona para a página de checkout com os parâmetros do plano
+        window.location.href = `checkout.html?plan=${encodeURIComponent(plan)}&price=${encodeURIComponent(price)}`;
     });
 });
 
