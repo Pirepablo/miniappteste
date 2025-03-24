@@ -52,14 +52,18 @@ if (document.querySelector('.planos')) {
             dadosCliente.plano = plano.getAttribute('data-nome');
             dadosCliente.valor = plano.getAttribute('data-valor');
             
-            console.log('Dados do plano:', dadosCliente);
-            localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
+            console.log('Dados do plano selecionado:', dadosCliente);
             
-            // Redirecionamento seguro
+            // Verificação EXTRA para ver se os dados estão sendo salvos
+            localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
+            console.log('Dados no localStorage:', localStorage.getItem('dadosCliente'));
+            
+            // Redirecionamento FORÇADO
+            window.location.href = 'cadastro.html';
+            
+            // Se estiver no Telegram (opcional)
             if (window.Telegram?.WebApp) {
-                Telegram.WebApp.openTelegramLink('https://t.me/seubot?start=miniapp_cadastro');
-            } else {
-                window.location.href = 'cadastro.html';
+                Telegram.WebApp.openTelegramLink('https://t.me/seubot/cadastro');
             }
         });
     });
