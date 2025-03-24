@@ -63,7 +63,7 @@ if (document.querySelector('.planos')) {
             
             // Se estiver no Telegram (opcional)
             if (window.Telegram?.WebApp) {
-                Telegram.WebApp.openTelegramLink('https://t.me/seubot/cadastro');
+                Telegram.WebApp.openTelegramLink('https://pirepablo.github.io/miniappteste/cadastro.html');
             }
         });
     });
