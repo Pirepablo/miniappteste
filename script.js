@@ -50,14 +50,25 @@ if (document.querySelector('.planos')) {
     });
 }
 
-// Página de Cadastro
-if (document.getElementById('formCadastro')) {
-    // Recupera os dados do plano
-    const dadosSalvos = JSON.parse(localStorage.getItem('dadosCliente'));
-    if (dadosSalvos) {
-        document.getElementById('planoEscolhido').value = dadosSalvos.plano;
-        document.getElementById('valorPlano').value = dadosSalvos.valor;
-    }
+// Página de Planos - Código Corrigido
+if (document.querySelector('.planos')) {
+    document.querySelectorAll('.btn-escolher').forEach(botao => {
+        botao.addEventListener('click', function(e) {
+            e.preventDefault(); // Impede comportamento padrão
+            
+            const plano = this.closest('.plano');
+            dadosCliente.plano = plano.getAttribute('data-nome');
+            dadosCliente.valor = plano.getAttribute('data-valor');
+            
+            // Debug: Verifique no console
+            console.log('Dados antes do redirecionamento:', dadosCliente);
+            
+            // Salva e redireciona CORRETAMENTE
+            localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
+            window.location.href = 'cadastro.html'; // Caminho relativo
+        });
+    });
+}
     
     // Máscaras de campos
     document.getElementById('cpf').addEventListener('input', function(e) {
