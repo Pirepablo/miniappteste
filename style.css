@@ -144,3 +144,15 @@ h1 {
 .btn-confirmar:hover {
     background-color: #219653;
 }
+
+.error {
+    color: #d32f2f;
+    background-color: #fde8e8;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid #d32f2f;
+}
+
+.error p {
+    margin: 5px 0;
+}

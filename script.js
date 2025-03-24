@@ -114,50 +114,83 @@ if (document.querySelector('.planos')) {
     });
 }
 
-// Página de Checkout
+// Página de Checkout - Código Corrigido
 if (document.getElementById('resumoPedido')) {
-    const dados = JSON.parse(localStorage.getItem('dadosCliente'));
+    // Debug: Mostra todos os itens no localStorage
+    console.log('Conteúdo do localStorage:', localStorage);
     
-    if (dados) {
+    // Recupera os dados com tratamento de erro
+    let dados;
+    try {
+        dados = JSON.parse(localStorage.getItem('dadosCliente'));
+        if (!dados) throw new Error('Dados não encontrados no localStorage');
+        
+        console.log('Dados recuperados:', dados); // Debug
+        
+        // Exibe os dados no resumo
         document.getElementById('resumoPedido').innerHTML = `
             <h3>Resumo do Pedido</h3>
-            <p><strong>Plano:</strong> ${dados.plano} (R$ ${dados.valor}/mês)</p>
-            <p><strong>Cliente:</strong> ${dados.nome}</p>
-            <p><strong>CPF:</strong> ${dados.cpf}</p>
-            <p><strong>Endereço:</strong> ${dados.endereco}, ${dados.numero} ${dados.complemento}</p>
-            <p><strong>Bairro:</strong> ${dados.bairro}</p>
-            <p><strong>Cidade:</strong> ${dados.municipio}</p>
-            <p><strong>CEP:</strong> ${dados.cep}</p>
-            <p><strong>Contato:</strong> ${dados.telefone} | ${dados.email}</p>
+            <p><strong>Plano:</strong> ${dados.plano || 'Não informado'} (R$ ${dados.valor || '0,00'}/mês)</p>
+            <p><strong>Cliente:</strong> ${dados.nome || 'Não informado'}</p>
+            <p><strong>CPF:</strong> ${dados.cpf || 'Não informado'}</p>
+            <p><strong>Endereço:</strong> 
+                ${dados.endereco || 'Não informado'}, 
+                ${dados.numero || 'S/N'} 
+                ${dados.complemento ? '- ' + dados.complemento : ''}
+            </p>
+            <p><strong>Bairro:</strong> ${dados.bairro || 'Não informado'}</p>
+            <p><strong>Cidade:</strong> ${dados.municipio || 'Não informado'}</p>
+            <p><strong>CEP:</strong> ${dados.cep || 'Não informado'}</p>
+            <p><strong>Contato:</strong> 
+                ${dados.telefone || 'Não informado'} | 
+                ${dados.email || 'Não informado'}
+            </p>
+        `;
+        
+    } catch (error) {
+        console.error('Erro ao recuperar dados:', error);
+        document.getElementById('resumoPedido').innerHTML = `
+            <div class="error">
+                <p>Erro ao carregar os dados do pedido.</p>
+                <p>Por favor, volte e preencha o formulário novamente.</p>
+            </div>
         `;
     }
-    
-    // Botão de confirmação
+
+    // Botão de confirmação (atualizado)
     document.getElementById('btnConfirmar').addEventListener('click', async function() {
+        if (!dados) {
+            alert('Dados do pedido não encontrados!');
+            return;
+        }
+
         try {
-            const response = await fetch(config.planilhaURL, {
+            const response = await fetch(config.WEB_APP_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
             });
             
             const result = await response.json();
             
             if (result.success) {
-                alert('Cadastro realizado com sucesso!');
+                alert('Pedido confirmado com sucesso!');
+                // Limpa o localStorage após confirmação
+                localStorage.removeItem('dadosCliente');
                 
-                // Se estiver no Telegram Web App
-                if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                // Fecha se for no Telegram Web App
+                if (window.Telegram?.WebApp) {
                     Telegram.WebApp.close();
+                } else {
+                    // Redireciona para uma página de obrigado se for navegador
+                    window.location.href = 'obrigado.html';
                 }
             } else {
                 throw new Error(result.error || 'Erro desconhecido');
             }
         } catch (error) {
             console.error('Erro:', error);
-            alert('Ocorreu um erro ao enviar os dados. Por favor, tente novamente.');
+            alert('Erro ao confirmar pedido: ' + error.message);
         }
     });
 }
