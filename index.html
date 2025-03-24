@@ -3,46 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Provedor de Internet</title>
+    <title>Planos de Internet</title>
     <link rel="stylesheet" href="style.css">
-	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div id="app">
-        <header>
-            <h1>Bem-vindo ao Nosso Provedor</h1>
-            <p>Sua conexão rápida e confiável!</p>
-        </header>
-
-        <main>
-            <section id="plans">
-                <h2>Nossos Planos de Internet</h2>
-                <div class="plan">
-                    <h3>Plano Básico</h3>
-                    <p><strong>Velocidade:</strong> 100 Mbps</p>
-                    <p><strong>Preço:</strong> R$ 99,90/mês</p>
-                    <button class="select-plan" data-plan="basico" data-price="R$ 99,90/mês">Selecionar Plano</button>
+    <div class="container">
+        <h1>Escolha Seu Plano</h1>
+        
+        <div class="planos">
+            <!-- Plano 100MB -->
+            <div class="plano" data-nome="100MB" data-valor="99.90">
+                <h2>100 Mega</h2>
+                <div class="detalhes">
+                    <p>Download: 100Mbps</p>
+                    <p>Upload: 50Mbps</p>
+                    <p class="preco">R$ 99,90/mês</p>
                 </div>
-                <div class="plan">
-                    <h3>Plano Intermediário</h3>
-                    <p><strong>Velocidade:</strong> 300 Mbps</p>
-                    <p><strong>Preço:</strong> R$ 149,90/mês</p>
-                    <button class="select-plan" data-plan="intermediario" data-price="R$ 149,90/mês">Selecionar Plano</button>
+                <button class="btn-escolher">Contratar</button>
+            </div>
+            
+            <!-- Plano 300MB -->
+            <div class="plano" data-nome="300MB" data-valor="149.90">
+                <h2>300 Mega</h2>
+                <div class="detalhes">
+                    <p>Download: 300Mbps</p>
+                    <p>Upload: 150Mbps</p>
+                    <p class="preco">R$ 149,90/mês</p>
                 </div>
-                <div class="plan">
-                    <h3>Plano Premium</h3>
-                    <p><strong>Velocidade:</strong> 1 Gbps</p>
-                    <p><strong>Preço:</strong> R$ 199,90/mês</p>
-                    <button class="select-plan" data-plan="premium" data-price="R$ 199,90/mês">Selecionar Plano</button>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <p>&copy; 2023 Provedor de Internet. Todos os direitos reservados.</p>
-        </footer>
+                <button class="btn-escolher">Contratar</button>
+            </div>
+        </div>
     </div>
 
-    <script src="javascript.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
