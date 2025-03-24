@@ -1,24 +1,10 @@
-/// Configuração - USE A MESMA PLANILHA DO BOT
+/// Configuração
 const config = {
-  SHEET_ID: '1vQVluNIwNQO0RbsQEFBYfxtDdGmzk3JBKWzTZv-rCUc', // Mesmo ID do bot
-  SHEET_NAME: 'Cadastro_MiniApp_Testes',         // Mesma aba do bot
-  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxEmQ7FW8YCug3IxvtNsi5IzsU6iuAIkd3VNPi5rLZAnKMgeRQSOtCLysfFmeYX5-bB/exec'  // Novo Web App (veja Passo 3)
+  SHEET_ID: '1vQVluNIwNQO0RbsQEFBYfxtDdGmzk3JBKWzTZv-rCUc',
+  SHEET_NAME: 'Cadastro_MiniApp_Testes',
+  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxEmQ7FW8YCug3IxvtNsi5IzsU6iuAIkd3VNPi5rLZAnKMgeRQSOtCLysfFmeYX5-bB/exec'
 };
 
-// Função para enviar dados ao Google Sheets (similar ao bot)
-async function saveToSheet(dados) {
-  try {
-    const response = await fetch(config.WEB_APP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dados)
-    });
-    return await response.json();
-  } catch (error) {
-    console.error("Erro ao salvar:", error);
-    return { success: false };
-  }
-}
 // Objeto para armazenar os dados
 const dadosCliente = {
     plano: '',
@@ -35,165 +21,138 @@ const dadosCliente = {
     municipio: ''
 };
 
-// Página de Planos
+// Inicialização do Telegram WebApp
+if (typeof Telegram !== 'undefined') {
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+}
+
+// Função para salvar dados
+async function saveToSheet(dados) {
+    try {
+        const response = await fetch(config.WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dados)
+        });
+        return await response.json();
+    } catch (error) {
+        console.error("Erro ao salvar:", error);
+        return { success: false };
+    }
+}
+
+// Página de Planos (Versão Única Corrigida)
 if (document.querySelector('.planos')) {
     document.querySelectorAll('.btn-escolher').forEach(botao => {
-        botao.addEventListener('click', function() {
+        botao.addEventListener('click', function(e) {
+            e.preventDefault();
+            
             const plano = this.closest('.plano');
             dadosCliente.plano = plano.getAttribute('data-nome');
             dadosCliente.valor = plano.getAttribute('data-valor');
             
-            // Salva no localStorage e redireciona
+            console.log('Dados do plano:', dadosCliente);
             localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-            window.location.href = 'cadastro.html';
+            
+            // Redirecionamento seguro
+            if (window.Telegram?.WebApp) {
+                Telegram.WebApp.openTelegramLink('https://t.me/seubot?start=miniapp_cadastro');
+            } else {
+                window.location.href = 'cadastro.html';
+            }
         });
     });
 }
 
-// Página de Planos - Código Corrigido
-if (document.querySelector('.planos')) {
-    document.querySelectorAll('.btn-escolher').forEach(botao => {
-        botao.addEventListener('click', function(e) {
-            e.preventDefault(); // Impede comportamento padrão
-            
-            const plano = this.closest('.plano');
-            dadosCliente.plano = plano.getAttribute('data-nome');
-            dadosCliente.valor = plano.getAttribute('data-valor');
-            
-            // Debug: Verifique no console
-            console.log('Dados antes do redirecionamento:', dadosCliente);
-            
-            // Salva e redireciona CORRETAMENTE
-            localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-            window.location.href = 'cadastro.html'; // Caminho relativo
+// Página de Cadastro
+if (document.getElementById('formCadastro')) {
+    // Recupera dados
+    const dadosSalvos = JSON.parse(localStorage.getItem('dadosCliente'));
+    if (dadosSalvos) {
+        document.getElementById('planoEscolhido').value = dadosSalvos.plano;
+        document.getElementById('valorPlano').value = dadosSalvos.valor;
+    }
+    
+    // Máscaras
+    const aplicarMascara = (elemento, padrao) => {
+        elemento.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '')
+                .replace(...padrao);
         });
-    });
-}
+    };
     
-    // Máscaras de campos
-    document.getElementById('cpf').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-            .replace(/(-\d{2})\d+?$/, '$1');
-    });
+    aplicarMascara(document.getElementById('cpf'), [/(\d{3})(\d)/, '$1.$2']);
+    aplicarMascara(document.getElementById('telefone'), [/(\d{2})(\d)/, '($1) $2']);
+    aplicarMascara(document.getElementById('cep'), [/(\d{5})(\d)/, '$1-$2']);
     
-    document.getElementById('telefone').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '')
-            .replace(/(\d{2})(\d)/, '($1) $2')
-            .replace(/(\d{5})(\d)/, '$1-$2')
-            .replace(/(-\d{4})\d+?$/, '$1');
-    });
-    
-    document.getElementById('cep').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '')
-            .replace(/(\d{5})(\d)/, '$1-$2')
-            .replace(/(-\d{3})\d+?$/, '$1');
-    });
-    
-    // Envio do formulário
+    // Formulário
     document.getElementById('formCadastro').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // Atualiza o objeto dadosCliente
-        dadosCliente.cpf = document.getElementById('cpf').value;
-        dadosCliente.nome = document.getElementById('nome').value;
-        dadosCliente.telefone = document.getElementById('telefone').value;
-        dadosCliente.email = document.getElementById('email').value;
-        dadosCliente.cep = document.getElementById('cep').value;
-        dadosCliente.endereco = document.getElementById('endereco').value;
-        dadosCliente.numero = document.getElementById('numero').value;
-        dadosCliente.complemento = document.getElementById('complemento').value;
-        dadosCliente.bairro = document.getElementById('bairro').value;
-        dadosCliente.municipio = document.getElementById('municipio').value;
+        // Atualiza objeto
+        Object.keys(dadosCliente).forEach(key => {
+            if (key !== 'plano' && key !== 'valor') {
+                dadosCliente[key] = document.getElementById(key)?.value || '';
+            }
+        });
         
-        // Salva e redireciona
         localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
         window.location.href = 'checkout.html';
     });
 }
 
-// Página de Checkout - Código Corrigido
+// Página de Checkout (Versão Aprimorada)
 if (document.getElementById('resumoPedido')) {
-    // Debug: Mostra todos os itens no localStorage
-    console.log('Conteúdo do localStorage:', localStorage);
+    const dados = JSON.parse(localStorage.getItem('dadosCliente')) || {};
+    const resumo = document.getElementById('resumoPedido');
     
-    // Recupera os dados com tratamento de erro
-    let dados;
-    try {
-        dados = JSON.parse(localStorage.getItem('dadosCliente'));
-        if (!dados) throw new Error('Dados não encontrados no localStorage');
-        
-        console.log('Dados recuperados:', dados); // Debug
-        
-        // Exibe os dados no resumo
-        document.getElementById('resumoPedido').innerHTML = `
-            <h3>Resumo do Pedido</h3>
-            <p><strong>Plano:</strong> ${dados.plano || 'Não informado'} (R$ ${dados.valor || '0,00'}/mês)</p>
-            <p><strong>Cliente:</strong> ${dados.nome || 'Não informado'}</p>
-            <p><strong>CPF:</strong> ${dados.cpf || 'Não informado'}</p>
-            <p><strong>Endereço:</strong> 
-                ${dados.endereco || 'Não informado'}, 
-                ${dados.numero || 'S/N'} 
-                ${dados.complemento ? '- ' + dados.complemento : ''}
-            </p>
-            <p><strong>Bairro:</strong> ${dados.bairro || 'Não informado'}</p>
-            <p><strong>Cidade:</strong> ${dados.municipio || 'Não informado'}</p>
-            <p><strong>CEP:</strong> ${dados.cep || 'Não informado'}</p>
-            <p><strong>Contato:</strong> 
-                ${dados.telefone || 'Não informado'} | 
-                ${dados.email || 'Não informado'}
-            </p>
-        `;
-        
-    } catch (error) {
-        console.error('Erro ao recuperar dados:', error);
-        document.getElementById('resumoPedido').innerHTML = `
+    if (!dados.plano) {
+        resumo.innerHTML = `
             <div class="error">
-                <p>Erro ao carregar os dados do pedido.</p>
-                <p>Por favor, volte e preencha o formulário novamente.</p>
+                <p>Erro: Dados do plano não encontrados</p>
+                <p>Por favor, inicie o processo novamente</p>
             </div>
         `;
+        return;
     }
-
-    // Botão de confirmação (atualizado)
-    document.getElementById('btnConfirmar').addEventListener('click', async function() {
-        if (!dados) {
-            alert('Dados do pedido não encontrados!');
-            return;
-        }
-
+    
+    // Exibe resumo
+    resumo.innerHTML = `
+        <h3>Resumo do Pedido</h3>
+        <p><strong>Plano:</strong> ${dados.plano} (R$ ${dados.valor}/mês)</p>
+        <p><strong>Cliente:</strong> ${dados.nome}</p>
+        <p><strong>CPF:</strong> ${dados.cpf}</p>
+        <p><strong>Endereço:</strong> ${dados.endereco}, ${dados.numero}</p>
+        ${dados.complemento ? `<p><strong>Complemento:</strong> ${dados.complemento}</p>` : ''}
+        <p><strong>Bairro:</strong> ${dados.bairro}</p>
+        <p><strong>Cidade:</strong> ${dados.municipio}</p>
+    `;
+    
+    // Confirmação
+    document.getElementById('btnConfirmar').addEventListener('click', async () => {
+        const loading = '<div class="loading">Enviando dados...</div>';
+        resumo.innerHTML += loading;
+        
         try {
-            const response = await fetch(config.WEB_APP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dados)
-            });
-            
-            const result = await response.json();
+            const result = await saveToSheet(dados);
             
             if (result.success) {
-                alert('Pedido confirmado com sucesso!');
-                // Limpa o localStorage após confirmação
                 localStorage.removeItem('dadosCliente');
+                alert('Cadastro realizado com sucesso!');
                 
-                // Fecha se for no Telegram Web App
                 if (window.Telegram?.WebApp) {
                     Telegram.WebApp.close();
                 } else {
-                    // Redireciona para uma página de obrigado se for navegador
                     window.location.href = 'obrigado.html';
                 }
             } else {
-                throw new Error(result.error || 'Erro desconhecido');
+                throw new Error(result.error || 'Erro no servidor');
             }
         } catch (error) {
-            console.error('Erro:', error);
-            alert('Erro ao confirmar pedido: ' + error.message);
+            console.error('Falha:', error);
+            resumo.querySelector('.loading')?.remove();
+            alert(`Falha: ${error.message}`);
         }
     });
 }
-// Integração com o Telegram
-Telegram.WebApp.ready();
-Telegram.WebApp.expand(); // Expande o app para tela cheia
