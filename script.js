@@ -43,7 +43,10 @@ async function saveToSheet(dados) {
 
 // ----- PÁGINA DE PLANOS -----
 if (document.querySelector('.planos')) {
-  document.querySelectorAll('.btn-escolher').forEach(botao => {
+  const botoes = document.querySelectorAll('.btn-escolher');
+  console.log('Número de botões encontrados:', botoes.length); // Depuração
+
+  botoes.forEach(botao => {
     botao.addEventListener('click', function() {
       const plano = this.closest('.plano');
       dadosCliente = {
@@ -52,11 +55,8 @@ if (document.querySelector('.planos')) {
         valor: plano.getAttribute('data-valor')
       };
       
-      console.log('Plano selecionado:', dadosCliente);
       localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-      
-      // Redirecionamento garantido
-      window.location.href = 'cadastro.html';
+      window.location.href = './cadastro.html'; // Caminho relativo explícito
     });
   });
 }
