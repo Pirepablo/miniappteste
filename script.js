@@ -43,11 +43,9 @@ async function saveToSheet(dados) {
 
 // ----- PÁGINA DE PLANOS -----
 if (document.querySelector('.planos')) {
-  const botoes = document.querySelectorAll('.btn-escolher');
-  console.log('Número de botões encontrados:', botoes.length); // Depuração
-
-  botoes.forEach(botao => {
+  document.querySelectorAll('.btn-escolher').forEach(botao => {
     botao.addEventListener('click', function() {
+      console.log('Botão clicado - Redirecionando...'); // Depuração
       const plano = this.closest('.plano');
       dadosCliente = {
         ...dadosCliente,
@@ -56,7 +54,13 @@ if (document.querySelector('.planos')) {
       };
       
       localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-      window.location.href = './cadastro.html'; // Caminho relativo explícito
+      
+      // Redirecionamento com fallback para Telegram
+      if (window.Telegram?.WebApp) {
+        Telegram.WebApp.openLink('https://pirepablo.github.io/miniappteste/cadastro.html');
+      } else {
+        window.location.href = '/cadastro.html'; // Caminho absoluto
+      }
     });
   });
 }
