@@ -47,10 +47,13 @@ h1 {
 
 .detalhes p {
     margin: 10px 0;
+	font-size: 1em;
+	font-weight: bold;
+    color: #27ae60;
 }
 
 .preco {
-    font-size: 1.5em;
+    font-size: 1em;
     font-weight: bold;
     color: #27ae60;
 }
