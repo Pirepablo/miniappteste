@@ -1,11 +1,32 @@
-/// Configuração - USE A MESMA PLANILHA DO BOT
+/// Configuração
 const config = {
-  SHEET_ID: '1vQVluNIwNQO0RbsQEFBYfxtDdGmzk3JBKWzTZv-rCUc', // Mesmo ID do bot
-  SHEET_NAME: 'Cadastro_MiniApp_Testes',         // Mesma aba do bot
-  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxEmQ7FW8YCug3IxvtNsi5IzsU6iuAIkd3VNPi5rLZAnKMgeRQSOtCLysfFmeYX5-bB/exec'  // Novo Web App (veja Passo 3)
+  SHEET_ID: '1vQVluNIwNQO0RbsQEFBYfxtDdGmzk3JBKWzTZv-rCUc',
+  WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxEmQ7FW8YCug3IxvtNsi5IzsU6iuAIkd3VNPi5rLZAnKMgeRQSOtCLysfFmeYX5-bB/exec'
 };
 
-// Função para enviar dados ao Google Sheets (similar ao bot)
+// Objeto para armazenar os dados
+let dadosCliente = {
+  plano: '',
+  valor: '',
+  cpf: '',
+  nome: '',
+  telefone: '',
+  email: '',
+  cep: '',
+  endereco: '',
+  numero: '',
+  complemento: '',
+  bairro: '',
+  municipio: ''
+};
+
+// Inicialização do Telegram WebApp
+if (typeof Telegram !== 'undefined') {
+  Telegram.WebApp.ready();
+  Telegram.WebApp.expand();
+}
+
+// Função para salvar dados
 async function saveToSheet(dados) {
   try {
     const response = await fetch(config.WEB_APP_URL, {
@@ -16,151 +37,127 @@ async function saveToSheet(dados) {
     return await response.json();
   } catch (error) {
     console.error("Erro ao salvar:", error);
-    return { success: false };
+    return { success: false, error: error.message };
   }
 }
-// Objeto para armazenar os dados
-const dadosCliente = {
-    plano: '',
-    valor: '',
-    cpf: '',
-    nome: '',
-    telefone: '',
-    email: '',
-    cep: '',
-    endereco: '',
-    numero: '',
-    complemento: '',
-    bairro: '',
-    municipio: ''
-};
 
-// Página de Planos
+// ----- PÁGINA DE PLANOS -----
 if (document.querySelector('.planos')) {
-    document.querySelectorAll('.btn-escolher').forEach(botao => {
-        botao.addEventListener('click', function() {
-            const plano = this.closest('.plano');
-            dadosCliente.plano = plano.getAttribute('data-nome');
-            dadosCliente.valor = plano.getAttribute('data-valor');
-            
-            // Salva no localStorage e redireciona
-            localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-            window.location.href = 'cadastro.html';
-        });
+  document.querySelectorAll('.btn-escolher').forEach(botao => {
+    botao.addEventListener('click', function() {
+      const plano = this.closest('.plano');
+      dadosCliente = {
+        ...dadosCliente,
+        plano: plano.getAttribute('data-nome'),
+        valor: plano.getAttribute('data-valor')
+      };
+      
+      console.log('Plano selecionado:', dadosCliente);
+      localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
+      
+      // Redirecionamento garantido
+      window.location.href = 'cadastro.html';
     });
+  });
 }
 
-// Página de Planos - Código Corrigido
-if (document.querySelector('.planos')) {
-    document.querySelectorAll('.btn-escolher').forEach(botao => {
-        botao.addEventListener('click', function(e) {
-            e.preventDefault(); // Impede comportamento padrão
-            
-            const plano = this.closest('.plano');
-            dadosCliente.plano = plano.getAttribute('data-nome');
-            dadosCliente.valor = plano.getAttribute('data-valor');
-            
-            // Debug: Verifique no console
-            console.log('Dados antes do redirecionamento:', dadosCliente);
-            
-            // Salva e redireciona CORRETAMENTE
-            localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-            window.location.href = 'cadastro.html'; // Caminho relativo
-        });
+// ----- PÁGINA DE CADASTRO -----
+if (document.getElementById('formCadastro')) {
+  // Carrega dados salvos
+  const savedData = JSON.parse(localStorage.getItem('dadosCliente')) || {};
+  dadosCliente = { ...dadosCliente, ...savedData };
+  
+  // Máscaras
+  const aplicarMascara = (elemento, pattern) => {
+    elemento.addEventListener('input', function(e) {
+      this.value = this.value.replace(/\D/g, '')
+        .replace(...pattern);
     });
-}
+  };
+  
+  aplicarMascara(document.getElementById('cpf'), 
+    [/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4']);
+  
+  aplicarMascara(document.getElementById('telefone'),
+    [/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3']);
+  
+  aplicarMascara(document.getElementById('cep'),
+    [/(\d{5})(\d{3})/, '$1-$2']);
+
+  // Submit do formulário
+  document.getElementById('formCadastro').addEventListener('submit', function(e) {
+    e.preventDefault();
     
-    // Máscaras de campos
-    document.getElementById('cpf').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d)/, '$1.$2')
-            .replace(/(\d{3})(\d{1,2})/, '$1-$2')
-            .replace(/(-\d{2})\d+?$/, '$1');
-    });
+    // Atualiza dados
+    dadosCliente = {
+      ...dadosCliente,
+      cpf: document.getElementById('cpf').value,
+      nome: document.getElementById('nome').value,
+      telefone: document.getElementById('telefone').value,
+      email: document.getElementById('email').value,
+      cep: document.getElementById('cep').value,
+      endereco: document.getElementById('endereco').value,
+      numero: document.getElementById('numero').value,
+      complemento: document.getElementById('complemento').value,
+      bairro: document.getElementById('bairro').value,
+      municipio: document.getElementById('municipio').value
+    };
     
-    document.getElementById('telefone').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '')
-            .replace(/(\d{2})(\d)/, '($1) $2')
-            .replace(/(\d{5})(\d)/, '$1-$2')
-            .replace(/(-\d{4})\d+?$/, '$1');
-    });
-    
-    document.getElementById('cep').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '')
-            .replace(/(\d{5})(\d)/, '$1-$2')
-            .replace(/(-\d{3})\d+?$/, '$1');
-    });
-    
-    // Envio do formulário
-    document.getElementById('formCadastro').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Atualiza o objeto dadosCliente
-        dadosCliente.cpf = document.getElementById('cpf').value;
-        dadosCliente.nome = document.getElementById('nome').value;
-        dadosCliente.telefone = document.getElementById('telefone').value;
-        dadosCliente.email = document.getElementById('email').value;
-        dadosCliente.cep = document.getElementById('cep').value;
-        dadosCliente.endereco = document.getElementById('endereco').value;
-        dadosCliente.numero = document.getElementById('numero').value;
-        dadosCliente.complemento = document.getElementById('complemento').value;
-        dadosCliente.bairro = document.getElementById('bairro').value;
-        dadosCliente.municipio = document.getElementById('municipio').value;
-        
-        // Salva e redireciona
-        localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
-        window.location.href = 'checkout.html';
-    });
+    console.log('Dados do formulário:', dadosCliente);
+    localStorage.setItem('dadosCliente', JSON.stringify(dadosCliente));
+    window.location.href = 'checkout.html';
+  });
 }
 
-// Página de Checkout
+// ----- PÁGINA DE CHECKOUT -----
 if (document.getElementById('resumoPedido')) {
-    const dados = JSON.parse(localStorage.getItem('dadosCliente'));
+  // Carrega dados
+  const dados = JSON.parse(localStorage.getItem('dadosCliente')) || {};
+  
+  if (!dados.plano) {
+    document.getElementById('resumoPedido').innerHTML = `
+      <div class="error">
+        <p>Dados do pedido não encontrados!</p>
+        <p>Por favor, inicie o processo novamente.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Exibe resumo
+  document.getElementById('resumoPedido').innerHTML = `
+    <h3>Resumo do Pedido</h3>
+    <p><strong>Plano:</strong> ${dados.plano} (R$ ${dados.valor}/mês)</p>
+    <p><strong>Nome:</strong> ${dados.nome || 'Não informado'}</p>
+    <p><strong>CPF:</strong> ${dados.cpf || 'Não informado'}</p>
+    <p><strong>Endereço:</strong> ${dados.endereco || ''}, ${dados.numero || ''} 
+    ${dados.complemento ? ' - ' + dados.complemento : ''}</p>
+    <p><strong>Bairro:</strong> ${dados.bairro || ''}</p>
+    <p><strong>Cidade:</strong> ${dados.municipio || ''}</p>
+    <p><strong>CEP:</strong> ${dados.cep || ''}</p>
+    <p><strong>Contato:</strong> ${dados.telefone || ''} | ${dados.email || ''}</p>
+  `;
+
+  // Confirmação
+  document.getElementById('btnConfirmar').addEventListener('click', async function() {
+    this.disabled = true;
+    this.textContent = 'Processando...';
     
-    if (dados) {
-        document.getElementById('resumoPedido').innerHTML = `
-            <h3>Resumo do Pedido</h3>
-            <p><strong>Plano:</strong> ${dados.plano} (R$ ${dados.valor}/mês)</p>
-            <p><strong>Cliente:</strong> ${dados.nome}</p>
-            <p><strong>CPF:</strong> ${dados.cpf}</p>
-            <p><strong>Endereço:</strong> ${dados.endereco}, ${dados.numero} ${dados.complemento}</p>
-            <p><strong>Bairro:</strong> ${dados.bairro}</p>
-            <p><strong>Cidade:</strong> ${dados.municipio}</p>
-            <p><strong>CEP:</strong> ${dados.cep}</p>
-            <p><strong>Contato:</strong> ${dados.telefone} | ${dados.email}</p>
-        `;
+    const result = await saveToSheet(dados);
+    
+    if (result.success) {
+      alert('Cadastro realizado com sucesso!');
+      localStorage.removeItem('dadosCliente');
+      
+      if (window.Telegram?.WebApp) {
+        Telegram.WebApp.close();
+      } else {
+        window.location.href = 'obrigado.html';
+      }
+    } else {
+      alert(`Erro: ${result.error || 'Falha ao salvar dados'}`);
+      this.disabled = false;
+      this.textContent = 'Tentar novamente';
     }
-    
-    // Botão de confirmação
-    document.getElementById('btnConfirmar').addEventListener('click', async function() {
-        try {
-            const response = await fetch(config.planilhaURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dados)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                alert('Cadastro realizado com sucesso!');
-                
-                // Se estiver no Telegram Web App
-                if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                    Telegram.WebApp.close();
-                }
-            } else {
-                throw new Error(result.error || 'Erro desconhecido');
-            }
-        } catch (error) {
-            console.error('Erro:', error);
-            alert('Ocorreu um erro ao enviar os dados. Por favor, tente novamente.');
-        }
-    });
+  });
 }
-// Integração com o Telegram
-Telegram.WebApp.ready();
-Telegram.WebApp.expand(); // Expande o app para tela cheia
